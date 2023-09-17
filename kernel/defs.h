@@ -1,3 +1,6 @@
+#include "types.h"
+#include "riscv.h"
+
 struct buf;
 struct context;
 struct file;
@@ -184,6 +187,14 @@ void            plic_complete(int);
 void            virtio_disk_init(void);
 void            virtio_disk_rw(struct buf *, int);
 void            virtio_disk_intr(void);
+
+// vga.c
+uint8 readport(uint32, uint8);
+void writeport(uint32, uint8, uint8);
+void vga_init(char *);
+
+// pci.c
+void pci_init();
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

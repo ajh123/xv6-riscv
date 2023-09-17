@@ -4,12 +4,6 @@
 #include "riscv.h"
 #include "defs.h"
 
-#define VRAM ((volatile uint8 *)0x50000000)
-
-// static const uint32 BACKGROUND = 0xffffff;
-#define WIDTH 320
-#define HEIGHT 200
-
 volatile static int started = 0;
 
 // start() jumps here in supervisor mode on all CPUs.
@@ -17,12 +11,7 @@ void
 main()
 {
   if(cpuid() == 0){
-    vga_init();
-    for (int x = 0; x < WIDTH; x++) {
-      for (int y = 0; y < HEIGHT; y++) {
-        VRAM[y * WIDTH + x] = 0x2f;
-      }
-    }
+    pci_init();      // initialize PCI interface
     consoleinit();
     printfinit();
     printf("\n");
