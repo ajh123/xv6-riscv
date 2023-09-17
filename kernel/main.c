@@ -32,12 +32,24 @@ main()
     iinit();         // inode table
     fileinit();      // file table
     virtio_disk_init(); // emulated hard disk
+    printf("pci init\n");
     pci_init();         // pci
+    printf("pci init done\n");
+    printf("socket init\n");
     socket_init();      // socket
+    printf("socket init done\n");
+    printf("arp init\n");
     arp_init();         // arp
+    printf("arp init done\n");
+    printf("tcp init\n");
     tcp_init();         // tcp
+    printf("tcp init done\n");
+    printf("udp init\n");
     udp_init();         // udp
+    printf("udp init done\n");
+    printf("user init\n");
     userinit();      // first user process
+    printf("user init done\n");
     __sync_synchronize();
     started = 1;
   } else {

@@ -20,6 +20,7 @@ pci_init()
     int offset = 0;
     uint32 diff = (bus << 16) | (dev << 11) | (func << 8) | (offset);
     volatile uint32 *base = ecam + diff;
+    printf("E1000 finding\n");
     if (*base == E1000_ID) {
       printf("E1000 found\n");
       // command register
