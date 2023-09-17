@@ -153,7 +153,7 @@ e1000_send(struct mbuf *m)
 void
 e1000_recv(void)
 {
-  uint32 desc_pos = (regs[E1000_RDT] + 1) % RX_RING_SIZE;
+  uint64 desc_pos = (regs[E1000_RDT] + 1) % RX_RING_SIZE;
 
   while (1) {
     struct rx_desc *tail = &rx_ring[desc_pos];

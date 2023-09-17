@@ -20,36 +20,24 @@ main()
     printf("\n");
     printf("xv6 kernel is booting\n");
     printf("\n");
-    kinit();         // physical page allocator
-    kvminit();       // create kernel page table
-    kvminithart();   // turn on paging
-    procinit();      // process table
-    trapinit();      // trap vectors
-    trapinithart();  // install kernel trap vector
-    plicinit();      // set up interrupt controller
-    plicinithart();  // ask PLIC for device interrupts
-    binit();         // buffer cache
-    iinit();         // inode table
-    fileinit();      // file table
+    kinit();            // physical page allocator
+    pci_init();         // initialize PCI interface
+    kvminit();          // create kernel page table
+    kvminithart();      // turn on paging
+    procinit();         // process table
+    trapinit();         // trap vectors
+    trapinithart();     // install kernel trap vector
+    plicinit();         // set up interrupt controller
+    plicinithart();     // ask PLIC for device interrupts
+    binit();            // buffer cache
+    iinit();            // inode table
+    fileinit();         // file table
     virtio_disk_init(); // emulated hard disk
-    printf("pci init\n");
-    pci_init();         // pci
-    printf("pci init done\n");
-    printf("socket init\n");
     socket_init();      // socket
-    printf("socket init done\n");
-    printf("arp init\n");
     arp_init();         // arp
-    printf("arp init done\n");
-    printf("tcp init\n");
     tcp_init();         // tcp
-    printf("tcp init done\n");
-    printf("udp init\n");
     udp_init();         // udp
-    printf("udp init done\n");
-    printf("user init\n");
-    userinit();      // first user process
-    printf("user init done\n");
+    userinit();         // first user process
     __sync_synchronize();
     started = 1;
   } else {
