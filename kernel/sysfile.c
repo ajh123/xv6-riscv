@@ -15,6 +15,7 @@
 #include "sleeplock.h"
 #include "file.h"
 #include "fcntl.h"
+#include "socket.h"
 
 // Fetch the nth word-sized system call argument as a file descriptor
 // and return both the descriptor and the corresponding struct file.
@@ -502,4 +503,26 @@ sys_pipe(void)
     return -1;
   }
   return 0;
+}
+
+uint64
+sys_connect(void)
+{
+  uint32 remote_ip_addr, remote_port, type;
+  argint(0, (int*) &remote_ip_addr);
+  argint(1, (int*) &remote_port);
+  argint(2, (int*) &type);
+  if ( remote_ip_addr < 0||
+       remote_port < 0 ||
+       type < 0 )
+    return -1;
+  struct file *f;
+  if (socket_alloc(&f, remote_ip_addr, remote_port, type) < 0)
+    return -1;
+  uint fd = fdalloc(f);
+  if (fd < 0) {
+    fileclose(f);
+    return -1;
+  }
+  return fd;
 }

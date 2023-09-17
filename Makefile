@@ -10,11 +10,22 @@ OBJS = \
   $K/kalloc.o \
   $K/spinlock.o \
   $K/string.o \
+  $K/utils.o \
+  $K/ip.o \
+  $K/arp.o \
+  $K/udp.o \
+  $K/mbuf.o \
+  $K/queue.o \
+  $K/ethernet.o \
+  $K/socket.o \
+  $K/e1000.o \
+  $K/pci.o \
   $K/main.o \
   $K/vm.o \
   $K/proc.o \
   $K/swtch.o \
   $K/trampoline.o \
+  $K/tcp.o \
   $K/trap.o \
   $K/syscall.o \
   $K/sysproc.o \
@@ -87,7 +98,7 @@ $U/initcode: $U/initcode.S
 tags: $(OBJS) _init
 	etags *.S *.c
 
-ULIB = $U/ulib.o $U/usys.o $U/printf.o $U/umalloc.o
+ULIB = $U/ulib.o $U/usys.o $U/printf.o $U/umalloc.o $U/dns.o $U/netlib.o
 
 _%: %.o $(ULIB)
 	$(LD) $(LDFLAGS) -T $U/user.ld -o $@ $^
@@ -117,6 +128,7 @@ mkfs/mkfs: mkfs/mkfs.c $K/fs.h $K/param.h
 
 UPROGS=\
 	$U/_cat\
+	$U/_curl\
 	$U/_echo\
 	$U/_forktest\
 	$U/_grep\
@@ -129,6 +141,8 @@ UPROGS=\
 	$U/_sh\
 	$U/_stressfs\
 	$U/_usertests\
+	$U/_nettests\
+	$U/_ping\
 	$U/_grind\
 	$U/_wc\
 	$U/_zombie\
@@ -156,10 +170,14 @@ ifndef CPUS
 CPUS := 3
 endif
 
+FWDPORT = $(shell expr `id -u` % 5000 + 25999)
+
 QEMUOPTS = -machine virt -bios none -kernel $K/kernel -m 128M -smp $(CPUS) -nographic
 QEMUOPTS += -global virtio-mmio.force-legacy=false
 QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=x0
 QEMUOPTS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
+QEMUOPTS += -netdev user,id=net0,hostfwd=udp::$(FWDPORT)-:2000 -object filter-dump,id=net0,netdev=net0,file=dump.pcap
+QEMUOPTS += -device e1000,netdev=net0,bus=pcie.0
 
 qemu: $K/kernel fs.img
 	$(QEMU) $(QEMUOPTS)

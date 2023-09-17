@@ -12,6 +12,7 @@
 #include "file.h"
 #include "stat.h"
 #include "proc.h"
+#include "socket.h"
 
 struct devsw devsw[NDEV];
 struct {
@@ -79,6 +80,8 @@ fileclose(struct file *f)
     begin_op();
     iput(ff.ip);
     end_op();
+  } else if (ff.type == FD_SOCKET) {
+    socket_close(ff.sock);
   }
 }
 
@@ -122,6 +125,8 @@ fileread(struct file *f, uint64 addr, int n)
     if((r = readi(f->ip, 1, addr, f->off, n)) > 0)
       f->off += r;
     iunlock(f->ip);
+  } else if (f->type == FD_SOCKET) {
+    r = socket_read(f->sock, addr, n);
   } else {
     panic("fileread");
   }
@@ -173,6 +178,8 @@ filewrite(struct file *f, uint64 addr, int n)
       i += r;
     }
     ret = (i == n ? n : -1);
+  } else if (f->type == FD_SOCKET) {
+    ret = socket_write(f->sock, addr, n);
   } else {
     panic("filewrite");
   }
